@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Administrace realizací | KOST STAV PRAHA s.r.o.</title>
+  <meta name="description" content="Administrace SEO realizací omítek a fasád pro KOST STAV PRAHA s.r.o.">
+  <meta name="robots" content="noindex,follow">
+<link rel="canonical" href="https://www.kost-stav.cz/admin.html">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="cs_CZ">
+<meta property="og:site_name" content="KOST STAV PRAHA s.r.o.">
+<meta property="og:title" content="Administrace realizac&#237; | KOST STAV PRAHA s.r.o.">
+<meta property="og:description" content="Administrace SEO realizac&#237; om&#237;tek a fas&#225;d pro KOST STAV PRAHA s.r.o.">
+<meta property="og:url" content="https://www.kost-stav.cz/admin.html">
+<meta property="og:image" content="https://www.kost-stav.cz/assets/images/moderni-exterier-rodinneho-domu.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Administrace realizac&#237; | KOST STAV PRAHA s.r.o.">
+<meta name="twitter:description" content="Administrace SEO realizac&#237; om&#237;tek a fas&#225;d pro KOST STAV PRAHA s.r.o.">
+<meta name="twitter:image" content="https://www.kost-stav.cz/assets/images/moderni-exterier-rodinneho-domu.jpg">
+<link rel="preconnect" href="https://www.google.com">
+<link rel="dns-prefetch" href="//www.google.com">
+
+<link rel="stylesheet" href="styles.css">
+  <script src="admin-realizace.js" defer></script>
+</head>
+<body>
+<header class="top">
+  <div class="container nav">
+    <a class="logo" href="index.html">KOST STAV PRAHA s.r.o.<span>administrace realizací</span></a>
+    <nav class="menu">
+      <a href="realizace.html">Realizace</a>
+      
+      <a href="kontakt.html">Kontakt</a>
+      <a class="btn" href="index.html">Zpět na web</a>
+    </nav>
+  </div>
+</header>
+
+<main class="admin-shell" data-admin-realizace>
+  <section class="pagehead">
+    <div class="container">
+      <p class="breadcrumb"><a href="index.html">Web</a> / Administrace</p>
+      <h1>SEO systém pro realizace omítek a fasád</h1>
+      <p class="muted">Správa projektů, automatické SEO texty, interní prolinkování, lokality a publikace statických stránek realizací.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="container">
+      <div class="admin-stats" aria-label="Dashboard">
+        <article class="admin-stat"><span>Realizace</span><strong data-stat="projects">0</strong></article>
+        <article class="admin-stat"><span>Města</span><strong data-stat="cities">0</strong></article>
+        <article class="admin-stat"><span>Publikované stránky</span><strong data-stat="published">0</strong></article>
+        <article class="admin-stat"><span>SEO lokality</span><strong data-stat="localities">258</strong></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="admin-workspace">
+    <div class="container admin-layout">
+      <form class="admin-panel admin-form" data-project-form action="/api/contact" method="POST" enctype="multipart/form-data">
+        <div class="admin-panel-head">
+          <div>
+            <p class="eyebrow">Projekty</p>
+            <h2>Nová realizace</h2>
+          </div>
+          <div class="admin-toolbar">
+            <button class="btn alt" type="button" data-new-project>Nový projekt</button>
+            <button class="btn" type="button" data-generate-seo>Vygenerovat SEO text</button>
+          </div>
+        </div>
+
+        <input type="hidden" name="id">
+
+        <div class="form-section">
+          <h3>Základní údaje</h3>
+          <div class="form-grid">
+            <div class="form-field"><label>Název projektu<input name="title" required placeholder="Strojní omítky rodinného domu Kladno"></label></div>
+            <div class="form-field"><label>URL slug<input name="slug" required placeholder="strojni-omitky-kladno-2026"></label></div>
+            <div class="form-field"><label>Město<input name="city" required placeholder="Kladno"></label></div>
+            <div class="form-field"><label>Okres<input name="district" required placeholder="Kladno"></label></div>
+            <div class="form-field"><label>Rok realizace<input name="year" type="number" min="2000" max="2100" required placeholder="2026"></label></div>
+            <div class="form-field"><label>Plocha m²<input name="area" type="number" min="1" step="1" required placeholder="280"></label></div>
+            <div class="form-field"><label>Typ realizace<input name="realizationType" required placeholder="Novostavba rodinného domu"></label></div>
+            <div class="form-field"><label>Stav publikace<select name="status"><option value="published">Publikováno</option><option value="draft">Koncept</option></select></label></div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Služby</h3>
+          <div class="choice-grid three" data-service-choices>
+            <label class="choice-pill"><input type="checkbox" name="services" value="Strojní sádrové omítky"> Strojní sádrové omítky</label>
+            <label class="choice-pill"><input type="checkbox" name="services" value="Štukové omítky"> Štukové omítky</label>
+            <label class="choice-pill"><input type="checkbox" name="services" value="Vápenocementové omítky"> Vápenocementové omítky</label>
+            <label class="choice-pill"><input type="checkbox" name="services" value="Zateplení fasády"> Zateplení fasády</label>
+            <label class="choice-pill"><input type="checkbox" name="services" value="Fasádní omítka"> Fasádní omítka</label>
+            <label class="choice-pill"><input type="checkbox" name="services" value="Kombinace služeb"> Kombinace služeb</label>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Fotogalerie</h3>
+          <div class="form-field"><label>Hlavní fotografie<input name="mainPhoto" placeholder="https://... nebo assets/realizace/foto.jpg"></label></div>
+          <div class="form-field"><label>Fotogalerie<textarea name="gallery" placeholder="Každou fotografii vložte na nový řádek."></textarea></label></div>
+          <div class="gallery-preview" data-gallery-preview></div>
+        </div>
+
+        <div class="form-section">
+          <h3>Popis realizace</h3>
+          <div class="form-field"><label>Popis projektu<textarea name="description" required placeholder="Popište rozsah, podklad, průběh a výsledek realizace."></textarea></label></div>
+          <div class="form-field"><label>Použité materiály<textarea name="materials" placeholder="Každý materiál vložte na nový řádek."></textarea></label></div>
+        </div>
+
+        <div class="form-section">
+          <h3>Automatické SEO</h3>
+          <div class="form-grid">
+            <div class="form-field"><label>SEO title<input name="seoTitle"></label></div>
+            <div class="form-field"><label>H1<input name="seoH1"></label></div>
+          </div>
+          <div class="form-field"><label>Meta description<textarea name="seoDescription"></textarea></label></div>
+          <div class="form-field"><label>SEO text 500–1000 slov<textarea name="seoText"></textarea></label></div>
+          <div class="form-field"><label>FAQ<textarea name="faq" placeholder="Otázka | Odpověď"></textarea></label></div>
+        </div>
+
+        <div class="seo-preview" data-seo-preview>
+          <strong>URL realizace</strong>
+          <span data-preview-url>/realizace/slug/</span>
+        </div>
+
+        <div class="form-alert" data-admin-alert role="status" aria-live="polite"></div>
+        <div class="admin-toolbar">
+          <button class="btn" type="submit">Uložit projekt</button>
+          <button class="btn alt" type="button" data-export-json>Exportovat data JSON</button>
+          <label class="btn alt admin-file-button">Importovat JSON<input type="file" data-import-json accept="application/json,.json"></label>
+        </div>
+      </form>
+
+      <aside class="admin-panel admin-sidebar">
+        <div class="admin-panel-head">
+          <div>
+            <p class="eyebrow">Obsah</p>
+            <h2>Realizace</h2>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Filtrovat realizace<input data-project-search placeholder="město, služba, slug"></label>
+        </div>
+        <div class="admin-list" data-project-list></div>
+        <div class="admin-note">
+          <h3>Publikace</h3>
+          <p class="muted">Pro produkční statický web uložte export do <code>data/realizace.json</code> a spusťte <code>generate-realizace-pages.ps1</code>. Generátor vytvoří stránky <code>/realizace/[slug]/</code>, výpis realizací a doplní sitemap.</p>
+        </div>
+      </aside>
+    </div>
+  </section>
+</main>
+<script src="ui.js" defer></script></body>
+</html>

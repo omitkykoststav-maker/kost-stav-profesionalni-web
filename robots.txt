@@ -1,0 +1,6 @@
+﻿User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /404.html
+
+Sitemap: https://www.kost-stav.cz/sitemap.xml
