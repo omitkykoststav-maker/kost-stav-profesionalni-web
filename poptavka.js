@@ -3,7 +3,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const params = new URLSearchParams(window.location.search);
   const wasSubmitted = params.get("odeslano") === "1";
   const thankYouMessage = "Děkujeme za poptávku. Ozveme se vám do 24 hodin.";
-  const thankYouUrl = "https://www.kost-stav.cz/dekujeme.html";
 
   forms.forEach((form) => {
     const alertBox = form.querySelector("[data-form-alert]");
@@ -56,29 +55,23 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       const submitButton = form.querySelector('button[type="submit"]');
-      const endpoint = form.getAttribute("action") || "/api/contact";
       setAlert("Odesíláme Vaši poptávku na e-mail omitkykoststav@gmail.com.");
       if (submitButton) submitButton.disabled = true;
 
       try {
-        const response = await fetch(endpoint, {
+        const response = await fetch("/api/contact", {
           method: "POST",
-          headers: { Accept: "application/json" },
           body: new FormData(form),
         });
 
         const result = await response.json();
 
-        if (result.ok && result.redirect) {
-          window.location.href = result.redirect;
+        if (result.ok === true) {
+          window.location.href = result.redirect || "/dekujeme.html";
           return;
         }
 
-        if (!response.ok || !result.ok) {
-          throw new Error(result.message || "Odeslání se nepodařilo.");
-        }
-
-        window.location.href = thankYouUrl;
+        throw new Error(result.message || "Odeslání se nepodařilo.");
       } catch (error) {
         console.error("Chyba při odesílání poptávky:", error);
         setAlert("Odeslání se nepodařilo. Zkuste to prosím znovu nebo nám zavolejte.", true);
