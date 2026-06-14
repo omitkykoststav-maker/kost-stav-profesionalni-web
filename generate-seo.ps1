@@ -406,7 +406,7 @@ function Hide-VisibleLocalityNavigation($Html, $RelativePath) {
 
 function Ensure-QuoteFormDelivery($Html) {
   $FormOpenPattern = '(?is)<form class="quote-form" data-poptavka-form(?:\s+action="[^"]*")?\s+method="POST"\s+enctype="[^"]*">\s*(?:<input type="hidden" name="_(?:subject|template|captcha|next)"[^>]*>\s*)*'
-  $FormOpen = "<form class=""quote-form"" data-poptavka-form method=""POST"" enctype=""multipart/form-data"">`r`n"
+  $FormOpen = "<form class=""quote-form"" data-poptavka-form action=""$FormAction"" method=""POST"" enctype=""multipart/form-data"">`r`n"
   return [regex]::Replace($Html, $FormOpenPattern, $FormOpen)
 }
 
@@ -517,6 +517,5 @@ Write-Sitemap $SitemapPages
 Write-Robots
 
 Write-Host "SEO build complete. HTML pages processed: $($HtmlFiles.Count). Sitemap URLs: $($SitemapPages.Count)."
-
 
 
