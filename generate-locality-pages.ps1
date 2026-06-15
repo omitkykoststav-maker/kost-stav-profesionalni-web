@@ -143,6 +143,12 @@ $ReviewBodies = @(
   "Líbilo se nám, že firma předem upozornila na slabší místa podkladu a navrhla řešení. Díky tomu nevznikaly nepříjemné změny uprostřed prací."
 )
 
+$RealizationGalleryImages = @(
+  "IMG_20260615_084156.jpg",
+  "IMG_20260615_084204.jpg",
+  "IMG_20260615_084214.jpg"
+)
+
 function Write-Utf8File($Path, $Content) {
   try {
     [System.IO.File]::WriteAllText($Path, $Content, $Utf8NoBom)
@@ -157,6 +163,31 @@ function Write-Utf8File($Path, $Content) {
 
 function Escape-Html($Text) {
   [System.Net.WebUtility]::HtmlEncode([string]$Text)
+}
+
+function Gallery-Service-Label($Service) {
+  switch ($Service.slug) {
+    "zatepleni-fasad" { "Zateplení fasády" }
+    default { $Service.title }
+  }
+}
+
+function Realization-Gallery($Service, $Loc) {
+  $Alt = Escape-Html "$(Gallery-Service-Label $Service) $($Loc.name) – realizace"
+  $Heading = $Alt
+  $Figures = ($RealizationGalleryImages | ForEach-Object {
+    "        <figure><img src=`"../assets/images/realizace/$_`" loading=`"lazy`" decoding=`"async`" alt=`"$Alt`"></figure>"
+  }) -join "`r`n"
+@"
+  <section class="locality-realization-gallery">
+    <div class="container">
+      <div class="section-head"><h2>$Heading</h2><p>Ukázky dokončených omítek a fasád z našich realizací.</p></div>
+      <div class="gallery">
+$Figures
+      </div>
+    </div>
+  </section>
+"@
 }
 
 function Cap($Text) {
@@ -275,6 +306,7 @@ function Praha-Strojni-Pillar-Page($Service, $Loc) {
   $Cards = Service-Cards $Loc $Service
   $Benefits = Benefit-Cards $Service $Loc
   $Form = Contact-Form $Service $Loc
+  $Gallery = Realization-Gallery $Service $Loc
 
 @"
 <!doctype html>
@@ -301,6 +333,7 @@ $Header
       <div class="actions"><a class="btn" href="$PhoneHref">Zavolat $Phone</a><a class="btn alt" href="$WhatsApp">WhatsApp poptávka</a></div>
     </div>
   </section>
+$Gallery
   <section>
     <div class="container seo-layout">
       <article class="seo-article">
@@ -479,6 +512,7 @@ function Locality-Page($Service, $Loc, $LocIndex, $ServiceIndex) {
   $Reviews = Review-Html $Service $Loc $LocIndex $ServiceIndex
   $Faq = Faq-Items $Service $Loc $LocIndex $ServiceIndex
   $Form = Contact-Form $Service $Loc
+  $Gallery = Realization-Gallery $Service $Loc
 
 @"
 <!doctype html>
@@ -506,6 +540,7 @@ $Header
       <div class="actions"><a class="btn" href="$PhoneHref">Zavolat $Phone</a><a class="btn alt" href="$WhatsApp">WhatsApp poptávka</a></div>
     </div>
   </section>
+$Gallery
   <section>
     <div class="container seo-layout">
       <article class="seo-article">
@@ -747,7 +782,6 @@ $SeoBuild = Join-Path $Root "generate-seo.ps1"
 if (Test-Path $SeoBuild) {
   & $SeoBuild
 }
-
 
 
 
