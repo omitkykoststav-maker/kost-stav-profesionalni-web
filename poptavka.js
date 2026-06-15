@@ -55,7 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       const submitButton = form.querySelector('button[type="submit"]');
-      setAlert("Odesíláme Vaši poptávku na e-mail omitkykoststav@gmail.com.");
+      setAlert("Odesíláme Vaši poptávku.");
       if (submitButton) submitButton.disabled = true;
 
       try {

@@ -1,0 +1,105 @@
+[
+  {
+    "id": "realizace-praha-9-vysocany-2026",
+    "status": "published",
+    "title": "Strojní sádrové omítky v rodinném domě Praha 9",
+    "slug": "strojni-sadrove-omitky-praha-9-vysocany-2026",
+    "city": "Praha 9",
+    "district": "Praha",
+    "year": 2026,
+    "area": 280,
+    "realizationType": "Novostavba rodinného domu",
+    "services": ["Strojní sádrové omítky", "Gletované sádrové omítky", "Vnitřní omítky"],
+    "mainPhoto": "assets/images/luxusni-bile-omitky-interier.jpg",
+    "gallery": [
+      "assets/images/ciste-bile-steny-interier.jpg",
+      "assets/images/moderni-interier-bile-steny.jpg",
+      "assets/images/luxusni-bile-omitky-interier.jpg"
+    ],
+    "description": "V novostavbě rodinného domu v Praze 9 jsme realizovali strojní sádrové omítky s důrazem na rovinnost, hladké detaily a čisté napojení špalet. Součástí zakázky byla příprava podkladu, osazení profilů, strojní aplikace omítkové směsi a závěrečná kontrola povrchů.",
+    "materials": ["sádrová omítková směs pro strojní aplikaci", "rohové a omítkové profily", "penetrační nátěr", "ochranné zakrývací materiály"],
+    "seo": {}
+  },
+  {
+    "id": "realizace-kladno-zatepleni-2025",
+    "status": "published",
+    "title": "Zateplení fasády bytového domu Kladno",
+    "slug": "zatepleni-fasady-kladno-2025",
+    "city": "Kladno",
+    "district": "Kladno",
+    "year": 2025,
+    "area": 520,
+    "realizationType": "Bytový dům",
+    "services": ["Zateplení fasády", "Fasádní omítka", "Sokl fasády"],
+    "mainPhoto": "assets/images/moderni-exterier-rodinneho-domu.jpg",
+    "gallery": [
+      "assets/images/moderni-rodinny-dum-kamenna-fasada.jpg",
+      "assets/images/detail-moderni-fasady-lamely.jpg",
+      "assets/images/moderni-fasadni-detail-okna.jpg"
+    ],
+    "description": "Na bytovém domě v Kladně jsme provedli kontaktní zateplovací systém, armovací vrstvu, finální fasádní omítku a úpravu soklu. Projekt vyžadoval přesné plánování etap, ochranu okolních ploch a důsledné řešení detailů kolem oken.",
+    "materials": ["kontaktní zateplovací systém", "fasádní izolant", "lepicí a stěrková hmota", "armovací tkanina", "finální fasádní omítka"],
+    "seo": {}
+  },
+  {
+    "id": "realizace-kolin-vapenocement-2025",
+    "status": "published",
+    "title": "Vápenocementové omítky Kolín",
+    "slug": "vapenocementove-omitky-kolin-2025",
+    "city": "Kolín",
+    "district": "Kolín",
+    "year": 2025,
+    "area": 190,
+    "realizationType": "Rekonstrukce přízemí domu",
+    "services": ["Vápenocementové omítky", "Jádrové omítky", "Vnitřní omítky"],
+    "mainPhoto": "assets/images/moderni-interier-bile-steny.jpg",
+    "gallery": [
+      "assets/images/luxusni-bile-omitky-interier.jpg",
+      "assets/images/ciste-bile-steny-interier.jpg"
+    ],
+    "description": "V Kolíně jsme v přízemí staršího domu realizovali vápenocementové omítky vhodné do více zatížených prostor. Před aplikací bylo nutné posoudit soudržnost původního zdiva, sjednotit savost a připravit pevný minerální podklad.",
+    "materials": ["vápenocementová omítková směs", "jádrová omítka", "penetrace pro minerální podklady", "rohové profily"],
+    "seo": {}
+  },
+  {
+    "id": "realizace-beroun-stuk-2024",
+    "status": "published",
+    "title": "Štukové omítky Beroun",
+    "slug": "stukove-omitky-beroun-2024",
+    "city": "Beroun",
+    "district": "Beroun",
+    "year": 2024,
+    "area": 160,
+    "realizationType": "Oprava vnitřních povrchů",
+    "services": ["Štukové omítky", "Vnitřní omítky"],
+    "mainPhoto": "assets/images/ciste-bile-steny-interier.jpg",
+    "gallery": [
+      "assets/images/luxusni-bile-omitky-interier.jpg",
+      "assets/images/moderni-interier-bile-steny.jpg"
+    ],
+    "description": "V Berouně jsme sjednotili vnitřní povrchy pomocí štukových omítek. Cílem bylo obnovit rovinu stěn, připravit povrch pro malbu a citlivě navázat nové vrstvy na původní konstrukce domu.",
+    "materials": ["jemná štuková směs", "penetrační nátěr", "lokální vysprávkové hmoty", "ochranné fólie"],
+    "seo": {}
+  },
+  {
+    "id": "realizace-ricany-fasada-2024",
+    "status": "published",
+    "title": "Fasádní omítka a oprava fasády Říčany",
+    "slug": "fasadni-omitka-ricany-2024",
+    "city": "Říčany",
+    "district": "Praha-východ",
+    "year": 2024,
+    "area": 310,
+    "realizationType": "Rodinný dům",
+    "services": ["Fasádní omítka", "Oprava fasády", "Sokl fasády"],
+    "mainPhoto": "assets/images/minimalisticka-bila-fasada-domu.jpg",
+    "gallery": [
+      "assets/images/detail-moderni-fasady-lamely.jpg",
+      "assets/images/moderni-fasadni-detail-okna.jpg",
+      "assets/images/elegantni-stavebni-reference-dum.jpg"
+    ],
+    "description": "U rodinného domu v Říčanech jsme provedli opravu fasády, sjednocení podkladu, finální fasádní omítku a úpravu soklové části. Důraz byl kladen na čisté hrany, odolnost povrchu a přirozený vzhled domu.",
+    "materials": ["fasádní penetrace", "armovací vrstva", "finální fasádní omítka", "soklová úprava"],
+    "seo": {}
+  }
+]
