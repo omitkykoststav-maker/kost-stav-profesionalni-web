@@ -64,14 +64,14 @@ document.addEventListener("DOMContentLoaded", () => {
           body: new FormData(form),
         });
 
-        const result = await response.json();
+        const data = await response.json();
 
-        if (result.ok === true) {
-          window.location.href = result.redirect || "/dekujeme.html";
+        if (data.ok === true && data.redirect) {
+          window.location.href = data.redirect;
           return;
         }
 
-        throw new Error(result.message || "Odeslání se nepodařilo.");
+        throw new Error(data.message || "Odeslání se nepodařilo.");
       } catch (error) {
         console.error("Chyba při odesílání poptávky:", error);
         setAlert("Odeslání se nepodařilo. Zkuste to prosím znovu nebo nám zavolejte.", true);
