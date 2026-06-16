@@ -146,7 +146,12 @@ $ReviewBodies = @(
 $RealizationGalleryImages = @(
   "IMG_20260615_084156.jpg",
   "IMG_20260615_084204.jpg",
-  "IMG_20260615_084214.jpg"
+  "IMG_20260615_084214.jpg",
+  "IMG_20260615_084219.jpg",
+  "IMG_20260615_084755.jpg",
+  "IMG_20260615_084803.jpg",
+  "IMG_20260615_084814.jpg",
+  "IMG_20260615_110123.jpg"
 )
 
 function Write-Utf8File($Path, $Content) {
@@ -782,7 +787,6 @@ $SeoBuild = Join-Path $Root "generate-seo.ps1"
 if (Test-Path $SeoBuild) {
   & $SeoBuild
 }
-
 
 
 
