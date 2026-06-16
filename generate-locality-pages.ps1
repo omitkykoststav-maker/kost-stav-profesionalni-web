@@ -187,7 +187,8 @@ $RealizationGalleryImages = @(
 )
 
 $RealizationGalleryNewImages = @($RealizationGalleryImages | Where-Object { $_ -match "20260616" })
-$PrahaLatestGalleryServices = @("strojni-omitky", "fasadni-prace", "zatepleni-fasad")
+$RealizationGalleryJune15Images = @($RealizationGalleryImages | Where-Object { $_ -match "20260615" })
+$GalleryUsedCombinations = @{}
 
 function Write-Utf8File($Path, $Content) {
   try {
@@ -220,42 +221,17 @@ function Gallery-Hash($Text) {
   return [int]$Hash
 }
 
-function Gallery-Page-Order($LocIndex, $ServiceIndex) {
-  if ($LocIndex -ge 100) {
-    return ($Localities.Count * $Services.Count) + (($LocIndex - 100) * $Services.Count) + $ServiceIndex
-  }
-  return ($LocIndex * $Services.Count) + $ServiceIndex
-}
-
-function Gallery-Image-Selection($Service, $Loc, $LocIndex, $ServiceIndex) {
+function Gallery-Build-Selection($SeedKey) {
   $PoolCount = $RealizationGalleryImages.Count
   if ($PoolCount -eq 0) { return @() }
 
-  if ($Loc.slug -eq "praha" -and $PrahaLatestGalleryServices -contains $Service.slug -and $RealizationGalleryNewImages.Count -ge 20) {
-    return @($RealizationGalleryNewImages)
-  }
-
-  $Seed = Gallery-Hash "$($Service.slug)-$($Loc.slug)"
-  $Count = [Math]::Min($PoolCount, 3 + ($Seed % 4))
-  $Start = (Gallery-Page-Order $LocIndex $ServiceIndex) % $PoolCount
-  $Steps = @(3, 7, 9, 11, 13, 17, 19, 21, 23, 27, 29, 31, 33, 37)
-  $Step = $Steps[$Seed % $Steps.Count]
+  $Seed = Gallery-Hash $SeedKey
+  $Count = [Math]::Min($PoolCount, 8 + ($Seed % 7))
   $Selected = New-Object System.Collections.Generic.List[string]
+  $OrderedImages = @($RealizationGalleryImages | Sort-Object @{ Expression = { Gallery-Hash ($SeedKey + "::" + [string]$_) } })
 
-  for ($Index = 0; $Selected.Count -lt $Count -and $Index -lt ($PoolCount * 2); $Index++) {
-    $Image = $RealizationGalleryImages[($Start + ($Index * $Step)) % $PoolCount]
-    if (-not $Selected.Contains($Image)) {
-      [void]$Selected.Add($Image)
-    }
-  }
-
-  $FallbackIndex = 0
-  while ($Selected.Count -lt $Count) {
-    $Image = $RealizationGalleryImages[$FallbackIndex % $PoolCount]
-    if (-not $Selected.Contains($Image)) {
-      [void]$Selected.Add($Image)
-    }
-    $FallbackIndex++
+  foreach ($Image in ($OrderedImages | Select-Object -First $Count)) {
+    [void]$Selected.Add($Image)
   }
 
   if ($RealizationGalleryNewImages.Count -gt 0 -and -not ($Selected | Where-Object { $_ -match "20260616" })) {
@@ -265,18 +241,43 @@ function Gallery-Image-Selection($Service, $Loc, $LocIndex, $ServiceIndex) {
     }
   }
 
+  if ($RealizationGalleryJune15Images.Count -gt 0 -and -not ($Selected | Where-Object { $_ -match "20260615" })) {
+    $Replacement = $RealizationGalleryJune15Images[$Seed % $RealizationGalleryJune15Images.Count]
+    if (-not $Selected.Contains($Replacement)) {
+      $ReplaceIndex = 0
+      for ($Index = $Selected.Count - 1; $Index -ge 0; $Index--) {
+        if ($Selected[$Index] -notmatch "20260616") {
+          $ReplaceIndex = $Index
+          break
+        }
+      }
+      $Selected[$ReplaceIndex] = $Replacement
+    }
+  }
+
+  return @($Selected)
+}
+
+function Gallery-Image-Selection($Service, $Loc, $LocIndex, $ServiceIndex) {
+  $BaseSeedKey = "$($Service.slug)-$($Loc.slug)"
+  $Selected = @()
+  for ($Salt = 0; $Salt -lt 500; $Salt++) {
+    $SeedKey = if ($Salt -eq 0) { $BaseSeedKey } else { "$BaseSeedKey-$Salt" }
+    $Selected = @(Gallery-Build-Selection $SeedKey)
+    $Combo = ($Selected | Sort-Object) -join "|"
+    if (-not $GalleryUsedCombinations.ContainsKey($Combo)) {
+      $GalleryUsedCombinations[$Combo] = $BaseSeedKey
+      return @($Selected)
+    }
+  }
   return @($Selected)
 }
 
 function Realization-Gallery($Service, $Loc, $LocIndex, $ServiceIndex) {
   $Alt = Escape-Html "$(Gallery-Service-Label $Service) $($Loc.name) – realizace"
   $Heading = $Alt
-  $ImageDir = "lokality"
-  if ($Loc.slug -eq "praha" -and $PrahaLatestGalleryServices -contains $Service.slug -and $RealizationGalleryNewImages.Count -ge 20) {
-    $ImageDir = "realizace"
-  }
   $Figures = (Gallery-Image-Selection $Service $Loc $LocIndex $ServiceIndex | ForEach-Object {
-    "        <figure><img src=`"../assets/images/$ImageDir/$_`" loading=`"lazy`" decoding=`"async`" alt=`"$Alt`"></figure>"
+    "        <figure><img src=`"../assets/images/realizace/$_`" loading=`"lazy`" decoding=`"async`" alt=`"$Alt`"></figure>"
   }) -join "`r`n"
 @"
   <section class="locality-realization-gallery">
@@ -882,11 +883,6 @@ $SeoBuild = Join-Path $Root "generate-seo.ps1"
 if (Test-Path $SeoBuild) {
   & $SeoBuild
 }
-
-
-
-
-
 
 
 
