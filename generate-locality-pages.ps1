@@ -144,6 +144,38 @@ $ReviewBodies = @(
 )
 
 $RealizationGalleryImages = @(
+  "IMG-20260616-WA0000.jpg",
+  "IMG-20260616-WA0001.jpg",
+  "IMG-20260616-WA0002.jpg",
+  "IMG-20260616-WA0003.jpg",
+  "IMG-20260616-WA0004.jpg",
+  "IMG-20260616-WA0005.jpg",
+  "IMG-20260616-WA0006.jpg",
+  "IMG-20260616-WA0007.jpg",
+  "IMG-20260616-WA0008.jpg",
+  "IMG-20260616-WA0009.jpg",
+  "IMG-20260616-WA0010.jpg",
+  "IMG-20260616-WA0011.jpg",
+  "IMG-20260616-WA0012.jpg",
+  "IMG-20260616-WA0013.jpg",
+  "IMG-20260616-WA0014.jpg",
+  "IMG-20260616-WA0015.jpg",
+  "IMG-20260616-WA0016.jpg",
+  "IMG-20260616-WA0017.jpg",
+  "IMG-20260616-WA0018.jpg",
+  "IMG-20260616-WA0019.jpg",
+  "IMG-20260616-WA0020.jpg",
+  "IMG-20260616-WA0021.jpg",
+  "IMG-20260616-WA0022.jpg",
+  "IMG-20260616-WA0023.jpg",
+  "IMG-20260616-WA0024.jpg",
+  "IMG-20260616-WA0025.jpg",
+  "IMG-20260616-WA0026.jpg",
+  "IMG-20260616-WA0027.jpg",
+  "IMG-20260616-WA0028.jpg",
+  "IMG-20260616-WA0029.jpg",
+  "IMG-20260616-WA0030.jpg",
+  "IMG-20260616-WA0031.jpg",
   "IMG_20260615_084156.jpg",
   "IMG_20260615_084204.jpg",
   "IMG_20260615_084214.jpg",
@@ -153,6 +185,8 @@ $RealizationGalleryImages = @(
   "IMG_20260615_084814.jpg",
   "IMG_20260615_110123.jpg"
 )
+
+$RealizationGalleryNewImages = @($RealizationGalleryImages | Where-Object { $_ -match "20260616" })
 
 function Write-Utf8File($Path, $Content) {
   try {
@@ -177,11 +211,63 @@ function Gallery-Service-Label($Service) {
   }
 }
 
-function Realization-Gallery($Service, $Loc) {
+function Gallery-Hash($Text) {
+  $Hash = 0
+  foreach ($Char in ([string]$Text).ToCharArray()) {
+    $Hash = (($Hash * 31) + [int][char]$Char) % 2147483647
+  }
+  return [int]$Hash
+}
+
+function Gallery-Page-Order($LocIndex, $ServiceIndex) {
+  if ($LocIndex -ge 100) {
+    return ($Localities.Count * $Services.Count) + (($LocIndex - 100) * $Services.Count) + $ServiceIndex
+  }
+  return ($LocIndex * $Services.Count) + $ServiceIndex
+}
+
+function Gallery-Image-Selection($Service, $Loc, $LocIndex, $ServiceIndex) {
+  $PoolCount = $RealizationGalleryImages.Count
+  if ($PoolCount -eq 0) { return @() }
+
+  $Seed = Gallery-Hash "$($Service.slug)-$($Loc.slug)"
+  $Count = [Math]::Min($PoolCount, 3 + ($Seed % 4))
+  $Start = (Gallery-Page-Order $LocIndex $ServiceIndex) % $PoolCount
+  $Steps = @(3, 7, 9, 11, 13, 17, 19, 21, 23, 27, 29, 31, 33, 37)
+  $Step = $Steps[$Seed % $Steps.Count]
+  $Selected = New-Object System.Collections.Generic.List[string]
+
+  for ($Index = 0; $Selected.Count -lt $Count -and $Index -lt ($PoolCount * 2); $Index++) {
+    $Image = $RealizationGalleryImages[($Start + ($Index * $Step)) % $PoolCount]
+    if (-not $Selected.Contains($Image)) {
+      [void]$Selected.Add($Image)
+    }
+  }
+
+  $FallbackIndex = 0
+  while ($Selected.Count -lt $Count) {
+    $Image = $RealizationGalleryImages[$FallbackIndex % $PoolCount]
+    if (-not $Selected.Contains($Image)) {
+      [void]$Selected.Add($Image)
+    }
+    $FallbackIndex++
+  }
+
+  if ($RealizationGalleryNewImages.Count -gt 0 -and -not ($Selected | Where-Object { $_ -match "20260616" })) {
+    $Replacement = $RealizationGalleryNewImages[$Seed % $RealizationGalleryNewImages.Count]
+    if (-not $Selected.Contains($Replacement)) {
+      $Selected[$Selected.Count - 1] = $Replacement
+    }
+  }
+
+  return @($Selected)
+}
+
+function Realization-Gallery($Service, $Loc, $LocIndex, $ServiceIndex) {
   $Alt = Escape-Html "$(Gallery-Service-Label $Service) $($Loc.name) – realizace"
   $Heading = $Alt
-  $Figures = ($RealizationGalleryImages | ForEach-Object {
-    "        <figure><img src=`"../assets/images/realizace/$_`" loading=`"lazy`" decoding=`"async`" alt=`"$Alt`"></figure>"
+  $Figures = (Gallery-Image-Selection $Service $Loc $LocIndex $ServiceIndex | ForEach-Object {
+    "        <figure><img src=`"../assets/images/lokality/$_`" loading=`"lazy`" decoding=`"async`" alt=`"$Alt`"></figure>"
   }) -join "`r`n"
 @"
   <section class="locality-realization-gallery">
@@ -299,7 +385,7 @@ function Contact-Form($Service, $Loc) {
 "@
 }
 
-function Praha-Strojni-Pillar-Page($Service, $Loc) {
+function Praha-Strojni-Pillar-Page($Service, $Loc, $LocIndex, $ServiceIndex) {
   $FileName = "$($Service.slug)-$($Loc.slug).html"
   $Canonical = "$SiteUrl/lokality/$FileName"
   $Title = "Strojní omítky Praha | Sádrové, štukové a vápenocementové omítky"
@@ -311,7 +397,7 @@ function Praha-Strojni-Pillar-Page($Service, $Loc) {
   $Cards = Service-Cards $Loc $Service
   $Benefits = Benefit-Cards $Service $Loc
   $Form = Contact-Form $Service $Loc
-  $Gallery = Realization-Gallery $Service $Loc
+  $Gallery = Realization-Gallery $Service $Loc $LocIndex $ServiceIndex
 
 @"
 <!doctype html>
@@ -517,7 +603,7 @@ function Locality-Page($Service, $Loc, $LocIndex, $ServiceIndex) {
   $Reviews = Review-Html $Service $Loc $LocIndex $ServiceIndex
   $Faq = Faq-Items $Service $Loc $LocIndex $ServiceIndex
   $Form = Contact-Form $Service $Loc
-  $Gallery = Realization-Gallery $Service $Loc
+  $Gallery = Realization-Gallery $Service $Loc $LocIndex $ServiceIndex
 
 @"
 <!doctype html>
@@ -749,7 +835,7 @@ for ($LocIndex = 0; $LocIndex -lt $Localities.Count; $LocIndex++) {
     $Service = $Services[$ServiceIndex]
     $FileName = "$($Service.slug)-$($Loc.slug).html"
     if ($Service.slug -eq "strojni-omitky" -and $Loc.slug -eq "praha") {
-      $Html = Praha-Strojni-Pillar-Page $Service $Loc
+      $Html = Praha-Strojni-Pillar-Page $Service $Loc $LocIndex $ServiceIndex
     } else {
       $Html = Locality-Page $Service $Loc $LocIndex $ServiceIndex
     }
@@ -787,8 +873,6 @@ $SeoBuild = Join-Path $Root "generate-seo.ps1"
 if (Test-Path $SeoBuild) {
   & $SeoBuild
 }
-
-
 
 
 
