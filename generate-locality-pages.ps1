@@ -187,6 +187,7 @@ $RealizationGalleryImages = @(
 )
 
 $RealizationGalleryNewImages = @($RealizationGalleryImages | Where-Object { $_ -match "20260616" })
+$PrahaLatestGalleryServices = @("strojni-omitky", "fasadni-prace", "zatepleni-fasad")
 
 function Write-Utf8File($Path, $Content) {
   try {
@@ -206,7 +207,7 @@ function Escape-Html($Text) {
 
 function Gallery-Service-Label($Service) {
   switch ($Service.slug) {
-    "zatepleni-fasad" { "Zateplení fasády" }
+    "zatepleni-fasad" { "Zateplení fasád" }
     default { $Service.title }
   }
 }
@@ -229,6 +230,10 @@ function Gallery-Page-Order($LocIndex, $ServiceIndex) {
 function Gallery-Image-Selection($Service, $Loc, $LocIndex, $ServiceIndex) {
   $PoolCount = $RealizationGalleryImages.Count
   if ($PoolCount -eq 0) { return @() }
+
+  if ($Loc.slug -eq "praha" -and $PrahaLatestGalleryServices -contains $Service.slug -and $RealizationGalleryNewImages.Count -ge 20) {
+    return @($RealizationGalleryNewImages)
+  }
 
   $Seed = Gallery-Hash "$($Service.slug)-$($Loc.slug)"
   $Count = [Math]::Min($PoolCount, 3 + ($Seed % 4))
@@ -266,8 +271,12 @@ function Gallery-Image-Selection($Service, $Loc, $LocIndex, $ServiceIndex) {
 function Realization-Gallery($Service, $Loc, $LocIndex, $ServiceIndex) {
   $Alt = Escape-Html "$(Gallery-Service-Label $Service) $($Loc.name) – realizace"
   $Heading = $Alt
+  $ImageDir = "lokality"
+  if ($Loc.slug -eq "praha" -and $PrahaLatestGalleryServices -contains $Service.slug -and $RealizationGalleryNewImages.Count -ge 20) {
+    $ImageDir = "realizace"
+  }
   $Figures = (Gallery-Image-Selection $Service $Loc $LocIndex $ServiceIndex | ForEach-Object {
-    "        <figure><img src=`"../assets/images/lokality/$_`" loading=`"lazy`" decoding=`"async`" alt=`"$Alt`"></figure>"
+    "        <figure><img src=`"../assets/images/$ImageDir/$_`" loading=`"lazy`" decoding=`"async`" alt=`"$Alt`"></figure>"
   }) -join "`r`n"
 @"
   <section class="locality-realization-gallery">
@@ -873,7 +882,6 @@ $SeoBuild = Join-Path $Root "generate-seo.ps1"
 if (Test-Path $SeoBuild) {
   & $SeoBuild
 }
-
 
 
 
