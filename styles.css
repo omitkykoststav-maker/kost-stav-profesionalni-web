@@ -1023,6 +1023,29 @@ label {
   background: var(--panel-2);
 }
 
+.blog-realization-photo {
+  margin: 34px 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: var(--shadow-soft);
+}
+
+.blog-realization-photo img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+}
+
+.blog-realization-photo figcaption {
+  padding: 10px 14px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 850;
+}
+
 .article-cta {
   margin: 34px 0;
   padding: clamp(22px, 3vw, 32px);

@@ -418,8 +418,12 @@ function Ensure-ImagePerformance($Html) {
     $Tag = $Match.Value
     $ImgIndex++
     if ($Tag -notmatch '\bdecoding=') { $Tag = $Tag -replace '<img\b', '<img decoding="async"' }
-    if ($ImgIndex -eq 1 -and $Tag -notmatch '\bfetchpriority=') { $Tag = $Tag -replace '<img\b', '<img fetchpriority="high"' }
     if ($ImgIndex -gt 1 -and $Tag -notmatch '\bloading=') { $Tag = $Tag -replace '<img\b', '<img loading="lazy"' }
+    if ($Tag -match '\bloading=["'']lazy["'']') {
+      $Tag = $Tag -replace '\s+fetchpriority=["'']high["'']', ''
+    } elseif ($ImgIndex -eq 1 -and $Tag -notmatch '\bfetchpriority=') {
+      $Tag = $Tag -replace '<img\b', '<img fetchpriority="high"'
+    }
     if ($Tag -match 'images\.unsplash\.com' -and $Tag -notmatch 'fm=webp') {
       $Tag = $Tag -replace '(\?[^"]*)"', '$1&fm=webp"'
     }

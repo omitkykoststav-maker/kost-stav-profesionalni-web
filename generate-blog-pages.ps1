@@ -55,6 +55,66 @@ function Escape-Html($Text) {
   [System.Net.WebUtility]::HtmlEncode([string]$Text)
 }
 
+function Get-BlogImageDateKey($Name) {
+  if ($Name -match 'IMG[-_](20\d{6})') { return [int64]$Matches[1] }
+  if ($Name -match '(20\d{6})') { return [int64]$Matches[1] }
+  return 0
+}
+
+function Get-ImageDimensions($Path) {
+  try {
+    Add-Type -AssemblyName System.Drawing -ErrorAction SilentlyContinue
+    $Image = [System.Drawing.Image]::FromFile($Path)
+    try {
+      return [pscustomobject]@{
+        width = $Image.Width
+        height = $Image.Height
+      }
+    } finally {
+      $Image.Dispose()
+    }
+  } catch {
+    return [pscustomobject]@{
+      width = 1200
+      height = 900
+    }
+  }
+}
+
+function Get-BlogRealizationImages {
+  $ImageDir = Join-Path $Root "assets\images\realizace"
+  if (!(Test-Path $ImageDir)) { return @() }
+
+  Get-ChildItem -Path $ImageDir -File |
+    Where-Object { $_.Extension -match '^\.(jpg|jpeg|png|webp|avif)$' } |
+    ForEach-Object {
+      $Dimensions = Get-ImageDimensions $_.FullName
+      [pscustomobject]@{
+        name = $_.Name
+        width = $Dimensions.width
+        height = $Dimensions.height
+        dateKey = Get-BlogImageDateKey $_.Name
+        lastWrite = $_.LastWriteTimeUtc
+      }
+    } |
+    Sort-Object @{ Expression = "dateKey"; Descending = $true }, @{ Expression = "lastWrite"; Descending = $true }, @{ Expression = "name"; Descending = $true }
+}
+
+function Get-BlogHash($Value) {
+  $Hash = 0
+  foreach ($Char in ([string]$Value).ToCharArray()) {
+    $Hash = (($Hash * 31) + [int]$Char) % 2147483647
+  }
+  return [int]$Hash
+}
+
+$Script:BlogRealizationImages = @(Get-BlogRealizationImages)
+$Script:BlogRecentImages = @($Script:BlogRealizationImages | Where-Object { $_.name -match '^IMG[-_]202606(16|17|18|19|20)' })
+$Script:BlogImagePool = if ($Script:BlogRecentImages.Count -ge 5) { @($Script:BlogRecentImages) } else { @($Script:BlogRealizationImages) }
+$Script:BlogInsertedImageCount = 0
+$Script:BlogUsedImages = @()
+$Script:BlogCreatedAltTexts = @()
+
 function Header-Html($Prefix) {
 @"
 <header class="top"><div class="container nav"><a class="logo" href="${Prefix}index.html">$Company<span>omítky a fasády Praha a Středočeský kraj</span></a><nav class="menu"><a href="${Prefix}index.html">Domů</a><a href="${Prefix}o-nas.html">O nás</a><a href="${Prefix}sluzby.html">Služby</a><a href="${Prefix}realizace.html">Realizace</a><a href="${Prefix}blog.html">Blog</a><a href="${Prefix}kontakt.html">Kontakt</a><a class="btn" href="$PhoneHref">Zavolat</a></nav></div></header>
@@ -87,6 +147,71 @@ function Faq-Html($Article) {
     @("Realizujete práce i mimo centrum Prahy?", "Ano, pracujeme v Praze, v lokalitách Praha-východ, Praha-západ a ve Středočeském kraji. Stačí nám poslat obec, rozsah prací a ideálně fotografie stavby.")
   )
   (($Items | ForEach-Object { "<details><summary>$(Escape-Html $_[0])</summary><p>$(Escape-Html $_[1])</p></details>" }) -join "`n")
+}
+
+function Get-ArticleImageAltTexts($Article) {
+  $CommonOmitky = @(
+    "Strojní omítky Praha – realizace",
+    "Sádrové omítky Praha – realizace",
+    "Štukové omítky Praha – realizace",
+    "Vápenocementové omítky Praha – realizace"
+  )
+  $CommonFasady = @(
+    "Fasádní práce Praha – realizace",
+    "Zateplení fasád Praha – realizace",
+    "Rekonstrukce fasády Praha – realizace"
+  )
+
+  switch ($Article.serviceSlug) {
+    "sadrove-omitky" { return @("Sádrové omítky Praha – realizace", "Strojní omítky Praha – realizace", "Štukové omítky Praha – realizace") }
+    "stukove-omitky" { return @("Štukové omítky Praha – realizace", "Strojní omítky Praha – realizace", "Sádrové omítky Praha – realizace") }
+    "vapenocementove-omitky" { return @("Vápenocementové omítky Praha – realizace", "Štukové omítky Praha – realizace", "Strojní omítky Praha – realizace") }
+    "fasadni-prace" { return @("Fasádní práce Praha – realizace", "Rekonstrukce fasády Praha – realizace", "Zateplení fasád Praha – realizace") }
+    "zatepleni-fasad" { return @("Zateplení fasád Praha – realizace", "Fasádní práce Praha – realizace", "Rekonstrukce fasády Praha – realizace") }
+  }
+
+  $Topic = "$($Article.title) $($Article.keyword) $($Article.summary)"
+  if ($Topic -match '(?i)fasád|fasad|zateplen') { return @($CommonFasady + $CommonOmitky) }
+  return $CommonOmitky
+}
+
+function Select-ArticleImages($Article) {
+  if ($Script:BlogImagePool.Count -eq 0) { return @() }
+
+  $Seed = Get-BlogHash "$($Article.slug)|$($Article.keyword)"
+  $DesiredCount = 3 + ($Seed % 3)
+  $Count = [Math]::Min($DesiredCount, $Script:BlogImagePool.Count)
+  $ArticleNumber = 0
+  try { $ArticleNumber = [int]$Article.no } catch { $ArticleNumber = 0 }
+  $Offset = if ($ArticleNumber -gt 0) {
+    ((($ArticleNumber - 1) * 5) + ($Seed % 5)) % $Script:BlogImagePool.Count
+  } else {
+    $Seed % $Script:BlogImagePool.Count
+  }
+  $Selected = @()
+
+  for ($Index = 0; $Index -lt $Count; $Index++) {
+    $PoolIndex = ($Offset + $Index) % $Script:BlogImagePool.Count
+    $Selected += $Script:BlogImagePool[$PoolIndex]
+  }
+
+  return $Selected
+}
+
+function Blog-Article-Photo($Image, $AltText) {
+  $SafeAlt = Escape-Html $AltText
+  $SafeSrc = Escape-Html "../assets/images/realizace/$($Image.name)"
+@"
+<figure class="blog-realization-photo">
+  <img src="$SafeSrc" alt="$SafeAlt" title="$SafeAlt" loading="lazy" decoding="async" width="$($Image.width)" height="$($Image.height)">
+  <figcaption>$SafeAlt</figcaption>
+</figure>
+"@
+}
+
+function Add-BlogPhotoBefore($Html, $Needle, $PhotoHtml) {
+  if ([string]::IsNullOrWhiteSpace($PhotoHtml)) { return $Html }
+  return $Html.Replace($Needle, "$PhotoHtml`n$Needle")
 }
 
 function Article-Paragraphs($Article) {
@@ -164,7 +289,26 @@ function Build-Article($Article) {
   $Canonical = "$SiteUrl/blog/$($Article.slug).html"
   $Links = Service-Link-Html $Article
   $Faq = Faq-Html $Article
-  $Body = (Article-Paragraphs $Article) + "`n" + $Links + "`n" + (Extra-Paragraphs $Article) + "`n" + (Article-Cta $Article) + "`n<section><h2>FAQ</h2><div class=""faq"">$Faq</div></section>"
+  $ArticleImages = @(Select-ArticleImages $Article)
+  $ArticleAlts = @(Get-ArticleImageAltTexts $Article)
+  $PhotoBlocks = @()
+
+  for ($Index = 0; $Index -lt $ArticleImages.Count; $Index++) {
+    $AltText = $ArticleAlts[$Index % $ArticleAlts.Count]
+    $PhotoBlocks += Blog-Article-Photo $ArticleImages[$Index] $AltText
+    $Script:BlogInsertedImageCount++
+    $Script:BlogUsedImages += $ArticleImages[$Index].name
+    $Script:BlogCreatedAltTexts += $AltText
+  }
+
+  $ArticleText = Article-Paragraphs $Article
+  $ExtraText = Extra-Paragraphs $Article
+  $ArticleText = Add-BlogPhotoBefore $ArticleText "<h2>Jak probíhá realizace krok za krokem</h2>" $PhotoBlocks[0]
+  $ArticleText = Add-BlogPhotoBefore $ArticleText "<h2>Cena a rozpočet bez nepříjemných překvapení</h2>" $PhotoBlocks[1]
+  $ArticleText = Add-BlogPhotoBefore $ArticleText "<h2>Nejčastější chyby a rizika</h2>" $PhotoBlocks[2]
+  $ArticleText = Add-BlogPhotoBefore $ArticleText "<h2>Interní odkazy a související služby</h2>" $PhotoBlocks[3]
+  $ExtraText = Add-BlogPhotoBefore $ExtraText "<h2>Doporučení pro zákazníky v Praze a okolí</h2>" $PhotoBlocks[4]
+  $Body = $ArticleText + "`n" + $Links + "`n" + $ExtraText + "`n" + (Article-Cta $Article) + "`n<section><h2>FAQ</h2><div class=""faq"">$Faq</div></section>"
   $Plain = [regex]::Replace($Body, "<[^>]+>", " ")
   $Words = @([regex]::Matches($Plain, "\S+")).Count
   $Schema = @{
@@ -176,6 +320,7 @@ function Build-Article($Article) {
     author = @{ "@type" = "Organization"; name = $Company }
     publisher = @{ "@type" = "Organization"; name = $Company }
     mainEntityOfPage = $Canonical
+    image = @($ArticleImages | ForEach-Object { "$SiteUrl/assets/images/realizace/$($_.name)" })
   } | ConvertTo-Json -Depth 6 -Compress
 @"
 <!doctype html>
@@ -354,6 +499,10 @@ Write-Host "Word count range: $Min - $Max."
 Write-Host "Articles below 1200 words: $Below."
 Write-Host "Articles above 1800 words: $Above."
 Write-Host "Updated blog.html, omitky.html, fasady.html, poptavka.html and sitemap.xml."
+Write-Host "Realization photos found: $($Script:BlogRealizationImages.Count)."
+Write-Host "Realization photos inserted into blog articles: $($Script:BlogInsertedImageCount)."
+Write-Host "Realization photos used in blog articles: $((@($Script:BlogUsedImages | Sort-Object -Unique)) -join ', ')."
+Write-Host "Blog image ALT texts: $((@($Script:BlogCreatedAltTexts | Sort-Object -Unique)) -join ', ')."
 
 $SeoBuild = Join-Path $Root "generate-seo.ps1"
 if (Test-Path $SeoBuild) {
