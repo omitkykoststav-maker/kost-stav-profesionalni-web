@@ -195,7 +195,7 @@ function Write-Utf8File($Path, $Content) {
     [System.IO.File]::WriteAllText($Path, $Content, $Utf8NoBom)
   } catch {
     try {
-      Set-Content -LiteralPath $Path -Encoding UTF8 -NoNewline -Value $Content
+      Set-Content -LiteralPath $Path -Encoding UTF8 -Value $Content
     } catch {
       Write-Warning "Soubor $Path se nepodařilo automaticky přepsat. Ponechávám existující verzi."
     }
@@ -577,7 +577,7 @@ function Locality-Page($Service, $Loc, $LocIndex, $ServiceIndex) {
   $FileName = "$($Service.slug)-$($Loc.slug).html"
   $Canonical = "$SiteUrl/lokality/$FileName"
   $Title = "$(Escape-Html "$($Service.title) $($Loc.name) | $Company")"
-  $Description = "$(Escape-Html "$($Service.title) $($Loc.name): kvalitní realizace, zaměření a nezávazná cenová nabídka zdarma. Omítky, zateplení fasád a fasádní práce pro Prahu a Středočeský kraj.")"
+  $Description = "$(Escape-Html "$($Service.title) $($Loc.name): odborná realizace, zaměření zdarma a férová nabídka pro Prahu a Středočeský kraj.")"
   $Keywords = "$(Escape-Html "$($Service.lower) $($Loc.name), strojní omítky Praha, strojní omítky Středočeský kraj, sádrové omítky Praha, štukové omítky Praha, vápenocementové omítky Praha, zateplení fasád Praha, zateplení fasád Středočeský kraj, fasádní práce Praha, fasádní práce Středočeský kraj")"
   $Opening = Opening-Text $Service $Loc ($LocIndex + $ServiceIndex)
   $Detail1 = Detail-Text $Service $Loc ($ServiceIndex + 1)
@@ -868,7 +868,13 @@ for ($LocIndex = 0; $LocIndex -lt $DeprecatedPragueDistricts.Count; $LocIndex++)
 
 Write-Utf8File (Join-Path $Root "lokality.html") (Overview-Page)
 Write-Utf8File (Join-Path $Root "sitemap.xml") (Sitemap-Html $PageFiles)
-Write-Utf8File (Join-Path $Root "robots.txt") (Robots-Txt)
+$RobotsPath = Join-Path $Root "robots.txt"
+$RobotsContent = Robots-Txt
+if ((Test-Path $RobotsPath) -and (([System.IO.File]::ReadAllText($RobotsPath) -replace "`r`n", "`n").Trim() -eq ($RobotsContent -replace "`r`n", "`n").Trim())) {
+  # Keep the existing robots.txt when the generated content is already current.
+} else {
+  Write-Utf8File $RobotsPath $RobotsContent
+}
 Update-RootNavigation
 
 $Min = $WordCounts | Sort-Object Words | Select-Object -First 1
@@ -883,9 +889,6 @@ $SeoBuild = Join-Path $Root "generate-seo.ps1"
 if (Test-Path $SeoBuild) {
   & $SeoBuild
 }
-
-
-
 
 
 

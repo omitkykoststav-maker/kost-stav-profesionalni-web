@@ -57,7 +57,7 @@ function Write-Utf8File($Path, $Content) {
   try {
     [System.IO.File]::WriteAllText($Path, $Content, $Utf8NoBom)
   } catch {
-    Set-Content -LiteralPath $Path -Encoding UTF8 -NoNewline -Value $Content
+    Set-Content -LiteralPath $Path -Encoding UTF8 -Value $Content
   }
 }
 
@@ -333,10 +333,6 @@ function Normalize-Head($Html, $RelativePath) {
   if ($Description.Length -gt 165) { $Description = $Description.Substring(0, 162).TrimEnd() + "..." }
 
   $CanonicalUrl = Get-CanonicalUrl $RelativePath
-  if (Is-DeprecatedPragueDistrict $RelativePath) {
-    $Indexable = $false
-    $CanonicalUrl = Get-DeprecatedCanonical $RelativePath $CanonicalUrl
-  }
   $SeoHead = Build-SeoHead $RelativePath $Title $Description $CanonicalUrl $Html $Indexable
 
   $Html = [regex]::Replace($Html, '(?is)<meta\s+name="robots"[^>]*>\s*', '')
@@ -467,8 +463,15 @@ Disallow: /404.html
 
 Sitemap: $SiteUrl/sitemap.xml
 "@
+  $RobotsPath = Join-Path $Root "robots.txt"
+  if (Test-Path $RobotsPath) {
+    $CurrentRobots = [System.IO.File]::ReadAllText($RobotsPath)
+    if (($CurrentRobots -replace "`r`n", "`n").Trim() -eq ($Robots -replace "`r`n", "`n").Trim()) {
+      return
+    }
+  }
   try {
-    Set-Content -LiteralPath (Join-Path $Root "robots.txt") -Encoding UTF8 -NoNewline -Value $Robots
+    Write-Utf8File $RobotsPath $Robots
   } catch {
     Write-Warning "robots.txt could not be updated automatically. Keeping the existing file."
   }
@@ -495,7 +498,7 @@ foreach ($File in $HtmlFiles) {
   $Html = Normalize-Head $Html $RelativePath
   Write-Utf8File $File.FullName $Html
 
-  if ($IndexExcluded -notcontains $RelativePath -and -not (Is-DeprecatedPragueDistrict $RelativePath)) {
+  if ($IndexExcluded -notcontains $RelativePath) {
     $Priority = "0.7"
     $ChangeFreq = "monthly"
     if ($RelativePath -eq "index.html") { $Priority = "1.0"; $ChangeFreq = "weekly" }
@@ -517,5 +520,3 @@ Write-Sitemap $SitemapPages
 Write-Robots
 
 Write-Host "SEO build complete. HTML pages processed: $($HtmlFiles.Count). Sitemap URLs: $($SitemapPages.Count)."
-
-
