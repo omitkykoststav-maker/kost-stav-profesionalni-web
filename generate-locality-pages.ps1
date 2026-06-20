@@ -143,51 +143,33 @@ $ReviewBodies = @(
   "Líbilo se nám, že firma předem upozornila na slabší místa podkladu a navrhla řešení. Díky tomu nevznikaly nepříjemné změny uprostřed prací."
 )
 
-$RealizationGalleryImages = @(
-  "IMG-20260616-WA0000.jpg",
-  "IMG-20260616-WA0001.jpg",
-  "IMG-20260616-WA0002.jpg",
-  "IMG-20260616-WA0003.jpg",
-  "IMG-20260616-WA0004.jpg",
-  "IMG-20260616-WA0005.jpg",
-  "IMG-20260616-WA0006.jpg",
-  "IMG-20260616-WA0007.jpg",
-  "IMG-20260616-WA0008.jpg",
-  "IMG-20260616-WA0009.jpg",
-  "IMG-20260616-WA0010.jpg",
-  "IMG-20260616-WA0011.jpg",
-  "IMG-20260616-WA0012.jpg",
-  "IMG-20260616-WA0013.jpg",
-  "IMG-20260616-WA0014.jpg",
-  "IMG-20260616-WA0015.jpg",
-  "IMG-20260616-WA0016.jpg",
-  "IMG-20260616-WA0017.jpg",
-  "IMG-20260616-WA0018.jpg",
-  "IMG-20260616-WA0019.jpg",
-  "IMG-20260616-WA0020.jpg",
-  "IMG-20260616-WA0021.jpg",
-  "IMG-20260616-WA0022.jpg",
-  "IMG-20260616-WA0023.jpg",
-  "IMG-20260616-WA0024.jpg",
-  "IMG-20260616-WA0025.jpg",
-  "IMG-20260616-WA0026.jpg",
-  "IMG-20260616-WA0027.jpg",
-  "IMG-20260616-WA0028.jpg",
-  "IMG-20260616-WA0029.jpg",
-  "IMG-20260616-WA0030.jpg",
-  "IMG-20260616-WA0031.jpg",
-  "IMG_20260615_084156.jpg",
-  "IMG_20260615_084204.jpg",
-  "IMG_20260615_084214.jpg",
-  "IMG_20260615_084219.jpg",
-  "IMG_20260615_084755.jpg",
-  "IMG_20260615_084803.jpg",
-  "IMG_20260615_084814.jpg",
-  "IMG_20260615_110123.jpg"
-)
+function Get-GalleryImageDateKey($Name) {
+  if ($Name -match "IMG[-_](20\d{6})") { return [int]$Matches[1] }
+  if ($Name -match "(20\d{6})") { return [int]$Matches[1] }
+  return 0
+}
 
-$RealizationGalleryNewImages = @($RealizationGalleryImages | Where-Object { $_ -match "20260616" })
-$RealizationGalleryJune15Images = @($RealizationGalleryImages | Where-Object { $_ -match "20260615" })
+function Get-RealizationGalleryImages {
+  $GalleryDir = Join-Path $Root "assets\images\realizace"
+  if (!(Test-Path $GalleryDir)) { return @() }
+
+  $ImageExtensions = @(".jpg", ".jpeg", ".png", ".webp", ".avif")
+  return @(
+    Get-ChildItem -Path $GalleryDir -File |
+      Where-Object { $ImageExtensions -contains $_.Extension.ToLowerInvariant() } |
+      Sort-Object `
+        @{ Expression = { Get-GalleryImageDateKey $_.Name }; Descending = $true },
+        @{ Expression = { $_.LastWriteTimeUtc }; Descending = $true },
+        @{ Expression = { $_.Name }; Descending = $true } |
+      ForEach-Object { $_.Name }
+  )
+}
+
+$RealizationGalleryImages = @(Get-RealizationGalleryImages)
+$RealizationGalleryRecentImages = @(
+  $RealizationGalleryImages | Where-Object { $_ -match "IMG[-_]202606(?:16|17|18|19|20)" }
+)
+$GalleryImagePool = if ($RealizationGalleryRecentImages.Count -ge 9) { @($RealizationGalleryRecentImages) } else { @($RealizationGalleryImages) }
 $GalleryUsedCombinations = @{}
 
 function Write-Utf8File($Path, $Content) {
@@ -222,36 +204,19 @@ function Gallery-Hash($Text) {
 }
 
 function Gallery-Build-Selection($SeedKey) {
-  $PoolCount = $RealizationGalleryImages.Count
+  $PoolCount = $GalleryImagePool.Count
   if ($PoolCount -eq 0) { return @() }
 
   $Seed = Gallery-Hash $SeedKey
-  $Count = [Math]::Min($PoolCount, 8 + ($Seed % 7))
+  $Count = [Math]::Min($PoolCount, 9 + ($Seed % 4))
   $Selected = New-Object System.Collections.Generic.List[string]
-  $OrderedImages = @($RealizationGalleryImages | Sort-Object @{ Expression = { Gallery-Hash ($SeedKey + "::" + [string]$_) } })
 
-  foreach ($Image in ($OrderedImages | Select-Object -First $Count)) {
-    [void]$Selected.Add($Image)
-  }
-
-  if ($RealizationGalleryNewImages.Count -gt 0 -and -not ($Selected | Where-Object { $_ -match "20260616" })) {
-    $Replacement = $RealizationGalleryNewImages[$Seed % $RealizationGalleryNewImages.Count]
-    if (-not $Selected.Contains($Replacement)) {
-      $Selected[$Selected.Count - 1] = $Replacement
-    }
-  }
-
-  if ($RealizationGalleryJune15Images.Count -gt 0 -and -not ($Selected | Where-Object { $_ -match "20260615" })) {
-    $Replacement = $RealizationGalleryJune15Images[$Seed % $RealizationGalleryJune15Images.Count]
-    if (-not $Selected.Contains($Replacement)) {
-      $ReplaceIndex = 0
-      for ($Index = $Selected.Count - 1; $Index -ge 0; $Index--) {
-        if ($Selected[$Index] -notmatch "20260616") {
-          $ReplaceIndex = $Index
-          break
-        }
-      }
-      $Selected[$ReplaceIndex] = $Replacement
+  $StartLimit = [Math]::Max(1, $PoolCount - $Count + 1)
+  $Start = $Seed % $StartLimit
+  for ($Offset = 0; $Offset -lt $PoolCount -and $Selected.Count -lt $Count; $Offset++) {
+    $Image = $GalleryImagePool[($Start + $Offset) % $PoolCount]
+    if (-not $Selected.Contains($Image)) {
+      [void]$Selected.Add($Image)
     }
   }
 
@@ -889,8 +854,6 @@ $SeoBuild = Join-Path $Root "generate-seo.ps1"
 if (Test-Path $SeoBuild) {
   & $SeoBuild
 }
-
-
 
 
 
