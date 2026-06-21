@@ -117,23 +117,23 @@ $Script:BlogCreatedAltTexts = @()
 
 function Header-Html($Prefix) {
 @"
-<header class="top"><div class="container nav"><a class="logo" href="${Prefix}index.html">$Company<span>omítky a fasády Praha a Středočeský kraj</span></a><nav class="menu"><a href="${Prefix}index.html">Domů</a><a href="${Prefix}o-nas.html">O nás</a><a href="${Prefix}sluzby.html">Služby</a><a href="${Prefix}realizace.html">Realizace</a><a href="${Prefix}blog.html">Blog</a><a href="${Prefix}kontakt.html">Kontakt</a><a class="btn" href="$PhoneHref">Zavolat</a></nav></div></header>
+<header class="top"><div class="container nav"><a class="logo" href="${Prefix}index.html">$Company<span>om&#237;tky a fas&#225;dy Praha a St&#345;edo&#269;esk&#253; kraj</span></a><nav class="menu" aria-label="Hlavn&#237; navigace"><a href="${Prefix}index.html">Dom&#367;</a><a href="${Prefix}omitky.html">Om&#237;tky</a><a href="${Prefix}fasady.html">Fas&#225;dy</a><a href="${Prefix}realizace.html">Realizace</a><a href="${Prefix}blog.html">Blog</a><a href="${Prefix}kontakt.html">Kontakt</a><a class="btn" href="${Prefix}poptavka.html">Popt&#225;vka zdarma</a></nav></div></header>
 "@
 }
 
 function Footer-Html($Prefix) {
 @"
-<a class="whatsapp" href="$WhatsApp">WhatsApp</a><footer class="footer"><div class="container footgrid"><div><h3>$Company</h3><p class="muted">Poctivé strojní omítky, sádrové omítky, štukové omítky, vápenocementové omítky, zateplení fasád a fasádní práce v Praze a Středočeském kraji.</p></div><div><h3>Rychlé odkazy</h3><p><a href="${Prefix}omitky.html">Omítky</a><br><a href="${Prefix}fasady.html">Fasády</a><br><a href="${Prefix}blog.html">Blog</a><br><a href="${Prefix}poptavka.html">Poptávka</a></p></div><div><h3>Kontakt</h3><p>K Žižkovu 809/7, Praha 9 – Vysočany<br><a href="$PhoneHref">$Phone</a><br><span>$Email</span></p></div></div><div class="container"><p class="muted">© 2026 $Company Všechna práva vyhrazena.</p></div></footer><script src="${Prefix}ui.js" defer></script>
+<footer class="footer"><div class="container footgrid"><div><h3>$Company</h3><p class="muted">Pr&#233;miov&#233; strojn&#237; om&#237;tky, s&#225;drov&#233; om&#237;tky, &#353;tukov&#233; om&#237;tky, v&#225;penocementov&#233; om&#237;tky, zateplen&#237; fas&#225;d a fas&#225;dn&#237; pr&#225;ce v Praze a St&#345;edo&#269;esk&#233;m kraji.</p></div><div><h3>Rychl&#233; odkazy</h3><p><a href="${Prefix}omitky.html">Om&#237;tky</a><br><a href="${Prefix}fasady.html">Fas&#225;dy</a><br><a href="${Prefix}realizace.html">Realizace</a><br><a href="${Prefix}blog.html">Blog</a><br><br><a href="${Prefix}kontakt.html">Kontakt</a></p></div><div><h3>Kontakt</h3><p>K &#381;i&#382;kovu 809/7, Praha 9 - Vyso&#269;any<br><a href="$PhoneHref">$Phone</a><br><span>$Email</span></p></div></div><div class="container"><p class="muted">&copy; 2026 $Company V&#353;echna pr&#225;va vyhrazena.</p></div></footer><script src="${Prefix}ui.js" defer></script>
 "@
 }
 
 function Service-Link-Html($Article) {
 @"
 <div class="article-links">
-  <a href="/omitky.html">Omítky</a>
-  <a href="/fasady.html">Fasády</a>
-  <a href="/kontakt.html">Kontakt</a>
-  <a href="/poptavka.html">Poptávka</a>
+  <a href="../omitky.html">Om&#237;tky</a>
+  <a href="../fasady.html">Fas&#225;dy</a>
+  <a href="../kontakt.html">Kontakt</a>
+  <a href="../poptavka.html">Popt&#225;vka</a>
 </div>
 "@
 }
@@ -259,7 +259,7 @@ function Article-Paragraphs($Article) {
 <p>KOST STAV PRAHA s.r.o. pomáhá zákazníkům v Praze a Středočeském kraji s konkrétním návrhem postupu. Nejdříve potřebujeme pochopit stavbu, potom doporučujeme řešení. Tento přístup je pomalejší než univerzální odpověď, ale vede k přesnější ceně a lepšímu výsledku.</p>
 
 <h2>Interní odkazy a související služby</h2>
-<p>Pokud řešíte hlavně vnitřní povrchy, pokračujte na stránku <a href="/omitky.html">Omítky</a>. Pokud vás zajímá obvodový plášť domu, zateplení nebo finální povrch, podívejte se na stránku <a href="/fasady.html">Fasády</a>. Pro rychlou domluvu je k dispozici <a href="/kontakt.html">Kontakt</a> a samostatná <a href="/poptavka.html">Poptávka</a>.</p>
+<p>Pokud řešíte hlavně vnitřní povrchy, pokračujte na stránku <a href="../omitky.html">Omítky</a>. Pokud vás zajímá obvodový plášť domu, zateplení nebo finální povrch, podívejte se na stránku <a href="../fasady.html">Fasády</a>. Pro rychlou domluvu je k dispozici <a href="../kontakt.html">Kontakt</a> a samostatná <a href="../poptavka.html">Poptávka</a>.</p>
 "@
 }
 
@@ -277,7 +277,7 @@ function Article-Cta($Article) {
 <div class="article-cta">
   <h2>Zavolejte nám ještě dnes a získejte nezávaznou cenovou nabídku zdarma.</h2>
   <p>Pošlete nám město, přibližnou plochu v m², fotografie stavby a požadovaný termín. Připravíme doporučení pro $($Article.service) a navrhneme další postup.</p>
-  <div class="actions"><a class="btn" href="$PhoneHref">$Phone</a><a class="btn alt" href="/poptavka.html">Odeslat poptávku</a></div>
+  <div class="actions"><a class="btn" href="$PhoneHref">$Phone</a><a class="btn alt" href="../poptavka.html">Odeslat poptávku</a></div>
 </div>
 "@
 }
@@ -353,8 +353,8 @@ $(Header-Html "../")
       <aside class="contactbox seo-sidebox">
         <h2>Rychlá nabídka</h2>
         <p class="muted">Řešíte $($Article.service) v Praze nebo okolí? Zavolejte nebo pošlete poptávku s fotkami a plochou v m².</p>
-        <div class="actions"><a class="btn" href="$PhoneHref">Zavolat</a><a class="btn alt" href="/poptavka.html">Poptávka</a></div>
-        <div class="mini-links"><a href="/omitky.html">Omítky</a><a href="/fasady.html">Fasády</a><a href="/kontakt.html">Kontakt</a></div>
+        <div class="actions"><a class="btn" href="$PhoneHref">Zavolat</a><a class="btn alt" href="../poptavka.html">Poptávka</a></div>
+        <div class="mini-links"><a href="../omitky.html">Omítky</a><a href="../fasady.html">Fasády</a><a href="../kontakt.html">Kontakt</a></div>
       </aside>
     </div>
   </section>
