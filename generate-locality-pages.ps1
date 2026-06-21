@@ -134,15 +134,6 @@ $FaqPool = @(
   @("Jak dlouho trvá realizace?", "Délka závisí na rozsahu, technologických přestávkách a připravenosti stavby. Po zaměření vám řekneme realistický harmonogram a upozorníme na místa, která mohou termín ovlivnit.")
 )
 
-$ReviewBodies = @(
-  "Domluva byla rychlá, práce proběhla podle plánu a po dokončení zůstalo staveniště uklizené. Oceňujeme hlavně jasnou komunikaci během celé realizace.",
-  "Potřebovali jsme poradit s vhodným postupem a dostali jsme konkrétní doporučení bez zbytečného natahování rozpočtu. Výsledek odpovídá dohodě.",
-  "Řemeslníci dorazili včas, chránili okolní prostory a detaily byly provedené pečlivě. Nabídku jsme měli přehlednou a termín byl dodržen.",
-  "Zakázka navazovala na další povrchové úpravy a oceňujeme, že vše bylo dobře zkoordinované. Povrchy jsou rovné a připravené na malování.",
-  "Komunikace byla věcná, cena srozumitelná a průběh bez zbytečných komplikací. Firmu bychom doporučili pro omítky i fasády.",
-  "Líbilo se nám, že firma předem upozornila na slabší místa podkladu a navrhla řešení. Díky tomu nevznikaly nepříjemné změny uprostřed prací."
-)
-
 function Get-GalleryImageDateKey($Name) {
   if ($Name -match "IMG[-_](20\d{6})") { return [int]$Matches[1] }
   if ($Name -match "(20\d{6})") { return [int]$Matches[1] }
@@ -256,6 +247,40 @@ $Figures
 "@
 }
 
+function Client-Ratings-Html {
+@"
+  <section class="client-ratings">
+    <div class="container">
+      <div class="section-head client-ratings-head"><h2>Co o nás říkají klienti</h2><p>Naši klienti nás hodnotí 5 z 5 hvězd na Google a 5 z 5 na Firmy.cz. Děkujeme za vaše doporučení!</p></div>
+      <div class="client-rating-grid">
+        <article class="client-rating-card">
+          <div class="client-rating-top">
+            <span class="google-wordmark" aria-label="Google"><span class="google-blue">G</span><span class="google-red">o</span><span class="google-yellow">o</span><span class="google-blue">g</span><span class="google-green">l</span><span class="google-red">e</span></span>
+            <span class="client-rating-source">Google</span>
+          </div>
+          <p class="client-rating-kicker">Recenze klientů</p>
+          <div class="client-rating-score"><strong>4.9</strong><span>/ 5</span></div>
+          <div class="client-rating-stars" aria-label="Hodnocení 4.9 z 5">★★★★★</div>
+          <p class="client-rating-note">37 recenzí od spokojených klientů</p>
+          <a class="client-rating-link" href="https://g.page/r/CfF6ouxQdyhXEBM/review" target="_blank" rel="noopener noreferrer">Přidat recenzi</a>
+        </article>
+        <article class="client-rating-card">
+          <div class="client-rating-top">
+            <span class="firmy-star-icon" aria-hidden="true">★</span>
+            <span class="client-rating-source">Firmy.cz</span>
+          </div>
+          <p class="client-rating-kicker">Hodnocení a kontakty</p>
+          <div class="client-rating-score"><strong>4.8</strong><span>/ 5</span></div>
+          <div class="client-rating-stars" aria-label="Hodnocení 4.8 z 5">★★★★★</div>
+          <p class="client-rating-note">21 hodnocení ověřených zákazníků</p>
+          <a class="client-rating-link" href="https://www.firmy.cz/detail/14021252-kost-stav-praha-praha-vysocany.html" target="_blank" rel="noopener noreferrer">Zobrazit hodnocení</a>
+        </article>
+      </div>
+    </div>
+  </section>
+"@
+}
+
 function Cap($Text) {
   if ([string]::IsNullOrWhiteSpace($Text)) { return "" }
   return $Text.Substring(0, 1).ToUpper() + $Text.Substring(1)
@@ -330,17 +355,6 @@ function Faq-Items($Service, $Loc, $LocIndex, $ServiceIndex) {
   (($Picked | ForEach-Object { "<details><summary>$($_[0])</summary><p>$($_[1])</p></details>" }) -join "")
 }
 
-function Review-Html($Service, $Loc, $LocIndex, $ServiceIndex) {
-  $Items = for ($Offset = 0; $Offset -lt 2; $Offset++) {
-    $Body = $ReviewBodies[($LocIndex * 2 + $ServiceIndex + $Offset) % $ReviewBodies.Count]
-    $Label = if ($Offset -eq 0) { $Service.title } else { $Services[($ServiceIndex + $Offset) % $Services.Count].title }
-@"
-<div class="review">„$Body“<strong>$Label, $($Loc.name)</strong></div>
-"@
-  }
-  ($Items -join "")
-}
-
 function Contact-Form($Service, $Loc) {
   $Message = [uri]::EscapeDataString("Dobrý den, mám zájem o $($Service.lower) $($Loc.prep). Prosím o nezávaznou cenovou nabídku.")
   $IsFacade = $Service.slug -in @("zatepleni-fasad", "fasadni-prace")
@@ -373,6 +387,7 @@ function Praha-Strojni-Pillar-Page($Service, $Loc, $LocIndex, $ServiceIndex) {
   $Benefits = Benefit-Cards $Service $Loc
   $Form = Contact-Form $Service $Loc
   $Gallery = Realization-Gallery $Service $Loc $LocIndex $ServiceIndex
+  $ClientRatings = Client-Ratings-Html
 
 @"
 <!doctype html>
@@ -400,6 +415,7 @@ $Header
     </div>
   </section>
 $Gallery
+$ClientRatings
   <section>
     <div class="container seo-layout">
       <article class="seo-article">
@@ -575,10 +591,10 @@ function Locality-Page($Service, $Loc, $LocIndex, $ServiceIndex) {
   $Footer = Footer-Html "../"
   $Cards = Service-Cards $Loc $Service
   $Benefits = Benefit-Cards $Service $Loc
-  $Reviews = Review-Html $Service $Loc $LocIndex $ServiceIndex
   $Faq = Faq-Items $Service $Loc $LocIndex $ServiceIndex
   $Form = Contact-Form $Service $Loc
   $Gallery = Realization-Gallery $Service $Loc $LocIndex $ServiceIndex
+  $ClientRatings = Client-Ratings-Html
 
 @"
 <!doctype html>
@@ -607,6 +623,7 @@ $Header
     </div>
   </section>
 $Gallery
+$ClientRatings
   <section>
     <div class="container seo-layout">
       <article class="seo-article">
@@ -653,12 +670,6 @@ $Gallery
         <p>Včasná poptávka pomáhá sladit materiál, přípravu podkladu, technologické přestávky a termín pro navazující řemesla bez zbytečného čekání.</p>
         <p>Stačí zavolat nebo poslat fotografie a krátký popis projektu.</p>
       </div>
-    </div>
-  </section>
-  <section class="section-soft">
-    <div class="container">
-      <div class="section-head"><h2>Recenze zákazníků</h2><p>Zákazníci oceňují rychlou domluvu, čistý průběh a férové jednání.</p></div>
-      <div class="reviews">$Reviews</div>
     </div>
   </section>
   <section>
@@ -854,6 +865,5 @@ $SeoBuild = Join-Path $Root "generate-seo.ps1"
 if (Test-Path $SeoBuild) {
   & $SeoBuild
 }
-
 
 
