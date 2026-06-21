@@ -39,8 +39,13 @@ document.addEventListener("DOMContentLoaded", () => {
   toggleStickyActions();
   window.addEventListener("scroll", toggleStickyActions, { passive: true });
 
-  const revealTargets = document.querySelectorAll("section, .card, .review, .contactbox, .gallery-photo, .premium-gallery figure");
+  // Never hide whole sections: if the observer is delayed, article pages can look blank.
+  const revealTargets = document.querySelectorAll(".card, .review, .contactbox, .gallery-photo, .premium-gallery figure");
   revealTargets.forEach((target) => target.classList.add("reveal"));
+
+  const showRevealTargets = () => {
+    revealTargets.forEach((target) => target.classList.add("is-visible"));
+  };
 
   if ("IntersectionObserver" in window) {
     const observer = new IntersectionObserver((entries) => {
@@ -52,7 +57,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }, { rootMargin: "0px 0px -12% 0px", threshold: 0.08 });
 
     revealTargets.forEach((target) => observer.observe(target));
+    window.setTimeout(showRevealTargets, 1200);
   } else {
-    revealTargets.forEach((target) => target.classList.add("is-visible"));
+    showRevealTargets();
   }
 });

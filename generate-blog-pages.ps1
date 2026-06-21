@@ -123,7 +123,7 @@ function Header-Html($Prefix) {
 
 function Footer-Html($Prefix) {
 @"
-<footer class="footer"><div class="container footgrid"><div><h3>$Company</h3><p class="muted">Pr&#233;miov&#233; strojn&#237; om&#237;tky, s&#225;drov&#233; om&#237;tky, &#353;tukov&#233; om&#237;tky, v&#225;penocementov&#233; om&#237;tky, zateplen&#237; fas&#225;d a fas&#225;dn&#237; pr&#225;ce v Praze a St&#345;edo&#269;esk&#233;m kraji.</p></div><div><h3>Rychl&#233; odkazy</h3><p><a href="${Prefix}omitky.html">Om&#237;tky</a><br><a href="${Prefix}fasady.html">Fas&#225;dy</a><br><a href="${Prefix}realizace.html">Realizace</a><br><a href="${Prefix}blog.html">Blog</a><br><br><a href="${Prefix}kontakt.html">Kontakt</a></p></div><div><h3>Kontakt</h3><p>K &#381;i&#382;kovu 809/7, Praha 9 - Vyso&#269;any<br><a href="$PhoneHref">$Phone</a><br><span>$Email</span></p></div></div><div class="container"><p class="muted">&copy; 2026 $Company V&#353;echna pr&#225;va vyhrazena.</p></div></footer><script src="${Prefix}ui.js" defer></script>
+<footer class="footer"><div class="container footgrid"><div><h3>$Company</h3><p class="muted">Pr&#233;miov&#233; strojn&#237; om&#237;tky, s&#225;drov&#233; om&#237;tky, &#353;tukov&#233; om&#237;tky, v&#225;penocementov&#233; om&#237;tky, zateplen&#237; fas&#225;d a fas&#225;dn&#237; pr&#225;ce v Praze a St&#345;edo&#269;esk&#233;m kraji.</p></div><div><h3>Rychl&#233; odkazy</h3><p><a href="${Prefix}omitky.html">Om&#237;tky</a><br><a href="${Prefix}fasady.html">Fas&#225;dy</a><br><a href="${Prefix}realizace.html">Realizace</a><br><a href="${Prefix}blog.html">Blog</a><br><br><a href="${Prefix}kontakt.html">Kontakt</a></p></div><div><h3>Kontakt</h3><p>K &#381;i&#382;kovu 809/7, Praha 9 - Vyso&#269;any<br><a href="$PhoneHref">$Phone</a><br><span>$Email</span></p></div></div><div class="container"><p class="muted">&copy; 2026 $Company V&#353;echna pr&#225;va vyhrazena.</p></div></footer><script src="/ui.js" defer></script>
 "@
 }
 
@@ -331,7 +331,7 @@ function Build-Article($Article) {
   <title>$(Escape-Html $Title)</title>
   <meta name="description" content="$(Escape-Html $MetaDescription)">
   <link rel="canonical" href="$Canonical">
-  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="/styles.css">
   <script type="application/ld+json">$Schema</script>
 </head>
 <body>
