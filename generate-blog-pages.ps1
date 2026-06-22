@@ -345,21 +345,20 @@ $(Header-Html "../")
       <p class="article-meta">Kategorie: <strong>$(Escape-Html $Article.category)</strong> · Klíčové téma: <strong>$(Escape-Html $Article.keyword)</strong> · Rozsah článku: $Words slov</p>
     </div>
   </section>
-  <section>
+  <section class="blog-content-section">
     <div class="container seo-layout">
       <article class="seo-article blog-article">
         $Body
       </article>
       <aside class="contactbox seo-sidebox">
-        <h2>Rychlá nabídka</h2>
-        <p class="muted">Řešíte $($Article.service) v Praze nebo okolí? Zavolejte nebo pošlete poptávku s fotkami a plochou v m².</p>
-        <div class="actions"><a class="btn" href="$PhoneHref">Zavolat</a><a class="btn alt" href="../poptavka.html">Poptávka</a></div>
-        <div class="mini-links"><a href="../omitky.html">Omítky</a><a href="../fasady.html">Fasády</a><a href="../kontakt.html">Kontakt</a></div>
+        <h2>Nezávazná poptávka</h2>
+        <p class="muted">Řešíte $($Article.service) v Praze nebo okolí? Pošlete nám lokalitu, přibližnou plochu a fotky stavby.</p>
+        $(Quote-Form-Html)
       </aside>
     </div>
   </section>
 </main>
-$(Footer-Html "../")
+$(Footer-Html "../")<script src="/poptavka.js" defer></script>
 </body>
 </html>
 "@
