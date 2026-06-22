@@ -605,6 +605,7 @@ section {
   max-width: 760px;
 }
 
+.client-ratings-grid,
 .client-rating-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -1583,6 +1584,7 @@ body.has-floating-actions .whatsapp {
     grid-template-columns: repeat(2, 1fr);
   }
 
+  .client-ratings-grid,
   .client-rating-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
